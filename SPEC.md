@@ -38,9 +38,16 @@ def post_opinion(opinion: str, reasoning: str, vote: int):
 
 ## Onchain Setup
 After the review step, take the output of the agent and cast an onchain vote on the proposal using web3.py.
-
 ```python
 def cast_vote(vote: int):
     # This function will cast a vote on the proposal.
     pass
 ```
+
+## Future Work
+* Set up the agent to listen to the blockchain for new proposal events.
+* Add search tools to the agent so it can pull context from the internet. 
+    * Perhaps using a query that only queries a specific website (e.g., the governance forum, Snapshot, etc.)
+* Add a tool that allows the agent to post to the governance forum.
+    * There is a Discourse API but it does not look like DAOs enable it on their own forums.
+* Add a tool that allows the agent to post to Snapshot.

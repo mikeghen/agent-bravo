@@ -1,15 +1,16 @@
-[tool.poetry]
-name = "agent_bravo"
+[project]
+name = "agent-bravo"
 version = "0.1.0"
-description = "agent-bravo using crewAI"
-authors = ["Your Name <you@example.com>"]
+description = "👎 Ehhh, not buyin' it... A framework for AI Agents to govern in GovernorBravo systems."
+authors = [
+    { name = "Michael Ghen", email = "mike@mikeghen.com" },
+]
+requires-python = ">=3.10,<=3.13"
+dependencies = [
+    "crewai[tools]>=0.55.2,<1.0.0",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.10,<=3.13"
-crewai = { extras = ["tools"], version = ">=0.55.2,<1.0.0" }
-
-
-[tool.poetry.scripts]
+[project.scripts]
 agent_bravo = "agent_bravo.main:run"
 run_crew = "agent_bravo.main:run"
 train = "agent_bravo.main:train"
@@ -17,5 +18,7 @@ replay = "agent_bravo.main:replay"
 test = "agent_bravo.main:test"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = [
+    "hatchling",
+]
+build-backend = "hatchling.build"

@@ -1,0 +1,18 @@
+review_task:
+  description: >
+    Review the proposal and provide an opinion, reasoning, and vote based on the following policy:
+    <Policy>
+    {policy}
+    </Policy>
+
+    <Proposal>
+    {proposal}
+    </Proposal>
+
+  expected_output: >
+    A JSON object with the following fields:
+    * `opinion`: The opinion of the agent.
+    * `reasoning`: The reasoning behind the opinion.
+    * `vote`: The vote of the agent (1 = for, 0 = against, -1 = abstain).
+
+  agent: delegate
