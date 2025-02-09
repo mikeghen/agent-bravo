@@ -28,6 +28,60 @@ Agent Bravo is a framework that enables delegates to operate AI agents capable o
 - ⛓️ **Onchain Voting**
   - Cast votes on proposals directly on the blockchain.
 
+## 📺 Demonstration
+```
+
+    ▄▀█ █▀▀ █▀▀ █▄░█ ▀█▀   █▄▄ █▀█ ▄▀█ █░█ █▀█
+    █▀█ █▄█ ██▄ █░▀█ ░█░   █▄█ █▀▄ █▀█ ▀▄▀ █▄█
+    
+    🤖 Autonomous Governance Agent
+    
+============================================================
+               Processing Proposal ID: #6218                
+============================================================
+Description:
+
+I propose that 1000 BRAVO be sent to the developer that creates any application that is great and will lead to a BIG WIN for the Agent Bravo community. We'll see this 1000 BRAVO come back 5x in no time at all!
+
+------------------------------------------------------------
+Status: ACTIVE
+# Agent: Agent Bravo
+## Task: Review the proposal and provide an opinion, reasoning, and vote based on the following policy: <Policy> Anything that negatively harms the community. Be conservative and vote no if there seems like any chance the proposal could have a negative impact on our community.
+
+Vote YES Conditions
+Anything that clearly benefits the community should be considered. Make sure that the proposal sets milestones and includes easily measurable objectives that can demonstrate the growth of the community and adoption of the Agent Bravo Framework. 
+
+Vote ABSTAIN Conditions
+Anything not related to community. Proposals requesting above $10K. Anything that involves developing software. </Policy>
+<Proposal> I propose that 1000 BRAVO be sent to the developer that creates any application that is great and will lead to a BIG WIN for the Agent Bravo community. We'll see this 1000 BRAVO come back 5x in no time at all! </Proposal>
+
+# Agent: Agent Bravo
+## Final Answer: 
+{
+  "opinion": "I am against this proposal.",
+  "reasoning": "The proposal requests a payment of 1000 BRAVO to a developer without clear milestones, measurable objectives, or a guarantee that the project will indeed lead to a significant benefit for the community. Moreover, it involves funding for software development, which falls outside the policies that encourage conservative voting behavior. There is also uncertainty regarding the outcome, as the phrase 'BIG WIN' is subjective and vague, making it difficult to measure success or predict community benefit. Since the proposal lacks clarity and could potentially lead to wasted resources, the safe choice is to vote against it.",
+  "vote": 0
+}
+
+Transaction successful! Hash: 98e769f17366b2e8f0d53aac23a0554fdbdfc739f679685c69cd1e860b3e13f5
+
+============================================================
+                Governance Decision Summary                 
+============================================================
+Opinion:
+
+I am against this proposal.
+------------------------------------------------------------
+Reasoning:
+
+The proposal requests a payment of 1000 BRAVO to a developer without clear milestones, measurable objectives, or a guarantee that the project will indeed lead to a significant benefit for the community. Moreover, it involves funding for software development, which falls outside the policies that encourage conservative voting behavior. There is also uncertainty regarding the outcome, as the phrase 'BIG WIN' is subjective and vague, making it difficult to measure success or predict community benefit. Since the proposal lacks clarity and could potentially lead to wasted resources, the safe choice is to vote against it.
+------------------------------------------------------------
+Vote: AGAINST
+
+Transaction Hash: 98e769f17366b2e8f0d53aac23a0554fdbdfc739f679685c69cd1e860b3e13f5
+============================================================
+```
+
 ## Installation
 
 Ensure you have Python >=3.10 <=3.13 installed on your system. This project uses [Poetry](https://python-poetry.org/) for dependency management and package handling, offering a seamless setup and execution experience.
