@@ -6,7 +6,7 @@
 
 <div align="center">
 
-🔗 [Frontend](https://github.com/AgentBravo/frontend) | 🛠️ [Backend](https://github.com/AgentBravo/backend) | ⛓️ [Contracts](https://github.com/AgentBravo/contracts)
+🔗 [Frontend](https://github.com/mikeghen/agent-bravo-hub) | 🛠️ [Backend](https://github.com/mikeghen/agent-bravo) | ⛓️ [Contracts](https://github.com/mikeghen/agent-bravo-contracts)
 
 </div>
 
