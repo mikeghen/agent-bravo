@@ -1,6 +1,11 @@
 from web3 import Web3
 from eth_account import Account
 import os
+from textwrap import dedent
+from dotenv import load_dotenv
+import json
+
+load_dotenv()
 
 PROPOSAL_ID = 15224123984213267098960411943118752395520351317670802264568797987915327925042
 GOVERNOR_ADDRESS = "0x9c5D85d2A24C2059C46950548c937f0a392849Ce"
@@ -16,6 +21,25 @@ DELEGATE_ABI = [{
     "name": "publishOpinionAndVote",
     "outputs": [{"name": "voteWeight", "type": "uint256"}],
     "stateMutability": "nonpayable",
+    "type": "function"
+}]
+
+DELEGATE_POLICY_ABI = [{
+    "inputs": [],
+    "name": "getVotingPolicy",
+    "outputs": [
+        {
+            "components": [
+                {"name": "backstory", "type": "string"},
+                {"name": "voteNoConditions", "type": "string"},
+                {"name": "voteYesConditions", "type": "string"},
+                {"name": "voteAbstainConditions", "type": "string"}
+            ],
+            "name": "policy",
+            "type": "tuple"
+        }
+    ],
+    "stateMutability": "view",
     "type": "function"
 }]
 
@@ -100,7 +124,7 @@ def publish_opinion_and_vote(gov_decision, proposal_id=PROPOSAL_ID):
     return tx_receipt 
 
 
-def get_proposal_created_events(from_block=122220603, to_block="latest"):
+def get_proposal_created_events(from_block=int(os.getenv('FROM_BLOCK', 0)), to_block="latest"):
     """
     Subscribes to the AgentBravoGovernor contract and retrieves ProposalCreated events.
     Gets logs in chunks of 50,000 blocks to avoid RPC limits.
@@ -166,39 +190,6 @@ def get_proposal_created_events(from_block=122220603, to_block="latest"):
 
     return all_logs 
 
-def has_voted(proposal_id, voter_address):
-    """
-    Checks if an address has already voted on a specific proposal.
-    
-    Args:
-        proposal_id (int): The ID of the proposal to check
-        voter_address (str): The address to check for voting history
-        
-    Returns:
-        bool: True if the address has voted, False otherwise
-    """
-    # Get the RPC_URL environment variable
-    rpc_url = os.getenv('RPC_URL')
-    if not rpc_url:
-        raise ValueError("RPC_URL environment variable is not set")
-    
-    # Set up Web3 connection
-    w3 = Web3(Web3.HTTPProvider(rpc_url))
-    
-    # Create contract instance
-    governor_contract = w3.eth.contract(
-        address=GOVERNOR_ADDRESS,
-        abi=GOVERNOR_ABI_SNIPPET
-    )
-    
-    # Check if address has voted
-    try:
-        has_voted = governor_contract.functions.hasVoted(proposal_id, voter_address).call()
-        return has_voted
-    except Exception as e:
-        print(f"Error checking vote status: {e}")
-        return False
-
 
 def get_proposal_status(proposal_id):
     """
@@ -241,3 +232,72 @@ def get_proposal_status(proposal_id):
     }
     
     return states.get(state_number, 'unknown') 
+
+def get_voting_policy():
+    """
+    Gets the voting policy from the delegate contract.
+    
+    Returns:
+        dict: A dictionary containing:
+            - backstory: The delegate's backstory
+            - policy: Formatted policy string containing vote conditions
+    """
+    # Get the RPC_URL and delegate address
+    rpc_url = os.getenv('RPC_URL')
+    delegate_address = os.getenv('DELEGATE_ADDRESS')
+    
+    if not rpc_url:
+        raise ValueError("RPC_URL environment variable is not set")
+    if not delegate_address:
+        raise ValueError("DELEGATE_ADDRESS environment variable is not set")
+    
+    # Set up Web3 connection
+    w3 = Web3(Web3.HTTPProvider(rpc_url))
+    
+    # Load delegate ABI from JSON file
+    with open("src/agent_bravo/config/abis/AgentBravoDelegate.json") as f:
+        delegate_abi = json.load(f)
+    
+    # Create contract instance with the loaded ABI
+    delegate_contract = w3.eth.contract(
+        address=delegate_address,
+        abi=delegate_abi
+    )
+    
+    try:
+        # Call the votingPolicy function from the delegate contract
+        policy = delegate_contract.functions.votingPolicy().call()
+        
+        # Format the policy into the expected structure
+        formatted_policy = dedent(f"""
+
+            {policy[1]}
+
+            Vote YES Conditions
+            {policy[2]}
+
+            Vote ABSTAIN Conditions
+            {policy[3]}
+        """).strip()
+        
+        return {
+            'backstory': policy[0],
+            'policy': formatted_policy
+        }
+        
+    except Exception as e:
+        print(f"Error fetching voting policy: {e}")
+        # Return default policy if contract call fails
+        return {
+            'backstory': "I am a seasoned delegate with experience reviewing governance proposals.",
+            'policy': dedent("""
+                Vote NO Conditions
+                The proposal does not clearly demonstrate a return on investment (ROI) of at least 10% annually.
+
+                Vote YES Conditions
+                The proposal clearly demonstrates a return on investment (ROI) of at least 10% annually.
+
+                Vote ABSTAIN Conditions
+                The proposal's return on investment (ROI) cannot be accurately determined from the provided information.
+            """).strip()
+        } 

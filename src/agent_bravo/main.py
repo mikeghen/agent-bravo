@@ -4,84 +4,87 @@ import os
 from textwrap import dedent
 from agent_bravo.crew import AgentBravoCrew
 from agent_bravo.models.gov_decision import GovDecision
-from agent_bravo.utils import get_proposal_created_events, get_proposal_status, publish_opinion_and_vote, has_voted
+from agent_bravo.utils import get_proposal_created_events, get_proposal_status, publish_opinion_and_vote, get_voting_policy
 
-POLICY = dedent("""
-    Vote NO Conditions
-    The proposal does not clearly demonstrate a return on investment (ROI) of at least 10% annually.
-
-    Vote YES Conditions
-    The proposal clearly demonstrates a return on investment (ROI) of at least 10% annually.
-
-    Vote ABSTAIN Conditions
-    The proposal's return on investment (ROI) cannot be accurately determined from the provided information.
-""")
-
-BACKSTORY = dedent("""
-    I am a seasoned delegate with experience reviewing governance proposals.
-""")
 
 def run():
     """
     Run Agent Bravo with a proposal and policy as inputs.
     """
+    # Display header
+    header_line = "=" * 60
+    print(header_line)
+    print("Agent Bravo - Governance Proposal Processor".center(60))
+    print(header_line)
+    print()
+
+    # --- Get Policy ---
+    policy_info = get_voting_policy()
+    policy = policy_info['policy']
+    backstory = policy_info['backstory']
+
     # --- Get Proposals ---
     proposals = get_proposal_created_events()
-    print(f"Found {len(proposals)} proposals all time.")
+    print(f"Total Proposals Found: {len(proposals)}")
+    print()
 
     # --- Process Proposals ---
     for proposal in proposals:
-        print(f"\n=== Processing Proposal ===")
-        print(f"Proposal ID: {proposal['proposalId']}")
-        print(f"Description: {proposal['description']}")
-        print("===========================\n")
-        proposal_id = proposal['proposalId']
-        description = proposal['description']
-
-        # --- Check Proposal Status is Active ---
-        status = get_proposal_status(proposal_id)
-        print(f"Proposal Status: {status}")
-
+        print(header_line)
+        # Only show the last 4 digits of the proposalId prefixed with a "#"
+        proposal_id_str = str(proposal['proposalId'])
+        short_proposal_id = "#" + proposal_id_str[-4:]
+        print(f"Processing Proposal ID: {short_proposal_id}".center(60))
+        print(header_line)
+        print(f"Description:\n{proposal['description']}")
+        print("-" * 60)
+        
+        # --- Check Proposal Status ---
+        status = get_proposal_status(proposal['proposalId'])
+        print(f"Status: {status.upper()}")
         if status != 'active':
-            print(f"Proposal {proposal_id} is not active, skipping...")
+            # Yellow colored message for skipped proposals
+            print("\033[93mSkipping proposal as it is not active.\033[0m")
+            print(header_line + "\n")
             continue
 
-        # --- Check if the delegate has already voted ---
-        if has_voted(proposal_id, os.getenv('DELEGATE_ADDRESS')):
-            print(f"Delegate has already voted on proposal {proposal_id}, skipping...")
-            continue
-
-        # --- Setup Agent Bravo Crew to handle the active proposal ---
+        # --- Setup Agent Bravo Crew for Active Proposal ---
         agent_bravo = AgentBravoCrew()
         crew = agent_bravo.crew()
         inputs = {
-            'proposal': description,
-            'policy': POLICY,
-            'backstory': BACKSTORY
+            'proposal': proposal['description'],
+            'policy': policy,
+            'backstory': backstory
         }
         crew.kickoff(inputs=inputs)
 
-        # --- Review the proposal and make a decision ---
-        # Convert results (GovDecision) to dictionary format.
-        # {
-        #     'opinion': 'The opinion of the agent',
-        #     'reasoning': 'The reasoning behind the opinion',
-        #     'vote': 0, 1, or 2 (0 = against, 1 = for, 2 = abstain)
-        # }
+        # --- Review Proposal and Make Decision ---
         gov_decision_dict = agent_bravo.review_task().output.to_dict()
         gov_decision = GovDecision(**gov_decision_dict)
 
-        # # --- Publish the decision to the blockchain ---
-        # tx_receipt = publish_opinion_and_vote(gov_decision)
+        # --- Publish Decision to the Blockchain ---
+        try:
+            tx_receipt = publish_opinion_and_vote(gov_decision, proposal_id=proposal['proposalId'])
+        except Exception as e:
+            # Red colored error message
+            print("\033[91m" + f"Error publishing decision to the blockchain: {e}" + "\033[0m")
+            print(header_line + "\n")
+            continue
 
-        # --- Print Decision Summary ---
-        print("\n=== Governance Decision Summary ===")
-        print(f"Opinion: \n{gov_decision.opinion}\n")
-        print(f"Reasoning: \n{gov_decision.reasoning}\n")
-        print(f"Vote: {'AGAINST' if gov_decision.vote == 0 else 'FOR' if gov_decision.vote == 1 else 'ABSTAIN'}")
-        # print(f"Transaction Hash: {tx_receipt['transactionHash'].hex() if tx_receipt else 'N/A'}")
-        print("================================\n")
+        # --- Display Governance Decision Summary ---
+        print("\n" + header_line)
+        print("Governance Decision Summary".center(60))
+        print(header_line)
+        print(f"Opinion:\n{gov_decision.opinion}")
+        print("-" * 60)
+        print(f"Reasoning:\n{gov_decision.reasoning}")
+        print("-" * 60)
+        vote_str = 'AGAINST' if gov_decision.vote == 0 else 'FOR' if gov_decision.vote == 1 else 'ABSTAIN'
+        print(f"Vote: {vote_str}")
+        print(f"Transaction Hash: {tx_receipt['transactionHash'].hex() if tx_receipt else 'N/A'}")
+        print(header_line + "\n")
         
+    print("Agent Bravo execution has completed.\n")
     return 0
 
 def train():
