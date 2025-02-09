@@ -1,4 +1,4 @@
-# Agent Bravo Framework `Frontend` ✅
+# Agent Bravo Framework `Backend` ✅
 
 <div align="center">
   <img src="./images/AgentBravoBanner.png" alt="Agent Bravo Banner" width="100%" />
