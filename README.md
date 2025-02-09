@@ -1,19 +1,31 @@
-# Agent Bravo
+# Agent Bravo Framework `Frontend` ✅
+
+<div align="center">
+  <img src="./images/AgentBravoBanner.png" alt="Agent Bravo Banner" width="100%" />
+</div>
+
+<div align="center">
+
+🔗 [Frontend](https://github.com/AgentBravo/frontend) | 🛠️ [Backend](https://github.com/AgentBravo/backend) | ⛓️ [Contracts](https://github.com/AgentBravo/contracts)
+
+</div>
+
+## 🎯 Overview
 
 Agent Bravo is a framework that enables delegates to operate AI agents capable of participating in any GovernorBravo-compatible governance system. Designed with autonomy in mind, Agent Bravo provides the essential functionalities required for seamless governance participation.
 
-## Features
+## ✨ Features
 
-- **Policy Enactment**
+- 📜 **Policy Enactment**
   - Enact policies (i.e., system prompts) provided by the agent's delegate owner.
   
-- **Governance Proposal Review**
+- 📋 **Governance Proposal Review**
   - Analyze and review governance proposals (i.e., user prompts).
   
-- **Discord Integration**
+- 💬 **Discord Integration**
   - Provide informed opinions to a channel on Discord.
     
-- **Onchain Voting**
+- ⛓️ **Onchain Voting**
   - Cast votes on proposals directly on the blockchain.
 
 ## Installation
@@ -34,12 +46,16 @@ crewai install
 ```
 ### Customizing
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
+Configure your environment variables in the `.env` file:
 
-- Modify `src/agent_bravo/config/agents.yaml` to define your agents
-- Modify `src/agent_bravo/config/tasks.yaml` to define your tasks
-- Modify `src/agent_bravo/crew.py` to add your own logic, tools and specific args
-- Modify `src/agent_bravo/main.py` to add custom inputs for your agents and tasks
+```bash
+OPENAI_API_KEY=your_openai_api_key    # Your OpenAI API key
+RPC_URL=your_rpc_url                  # RPC endpoint for blockchain interaction
+PRIVATE_KEY=your_private_key          # Private key for transaction signing
+DELEGATE_ADDRESS=your_delegate_address # Address of the Agent Bravo Delegate
+FROM_BLOCK=block_number               # Starting block number for proposal scanning
+```
+
 
 ## Running the Project
 
@@ -49,20 +65,53 @@ To kickstart your crew of AI agents and begin task execution, run this from the 
 $ crewai run
 ```
 
-This command initializes the agent-bravo Crew, assembling the agents and assigning them tasks as defined in your configuration.
+If everything works correctly, you should see the following output:
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+```bash 
 
-## Understanding Your Crew
+    ▄▀█ █▀▀ █▀▀ █▄░█ ▀█▀   █▄▄ █▀█ ▄▀█ █░█ █▀█
+    █▀█ █▄█ ██▄ █░▀█ ░█░   █▄█ █▀▄ █▀█ ▀▄▀ █▄█
+    
+    🤖 Autonomous Governance Agent
+```
+And then the system will run and a summary of the proposal will be published after its done. An example of the output can be seen below:
 
-The agent-bravo Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+```bash 
+...
+```
 
-## Support
+## Understanding Your AI Delegate
 
-For support, questions, or feedback regarding the AgentBravo Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+The Agent Bravo Delegate is composed of multiple AI agents, each with unique roles, goals, and tools. The configuration is spread across multiple files that work together through a templating system:
 
-Let's create wonders together with the power and simplicity of crewAI.
+### Configuration Files
+
+- `config/agents.yaml`: Defines the agent's role, goals, and backstory. The `backstory` field is templated and populated from your environment configuration, allowing you to customize the agent's context and perspective.
+
+```yaml
+delegate:
+  backstory: >
+    {backstory}  # Your delegate's backstory from onchain
+```
+
+- `config/tasks.yaml`: Specifies the tasks that agents perform. Uses templating to inject the governance proposal and voting policy:
+
+```yaml
+review_task:
+  description: >
+    # Templates filled at runtime:
+    {policy}     # Your delegate's voting policy from onchain
+    {proposal}   # The current governance proposal
+```
+
+### Runtime Flow
+
+1. The main script (`src/agent_bravo/main.py`) loads your delegate's policy and backstory
+2. For each governance proposal:
+   - Templates are populated with the current proposal details
+   - The agent reviews the proposal using the configured policy
+   - Produces a structured decision (opinion, reasoning, and vote)
+   - Executes the vote on-chain
+
+This templating system allows you to easily customize your delegate's behavior by modifying the policy and backstory without changing the core logic.
+

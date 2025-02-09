@@ -270,14 +270,14 @@ def get_voting_policy():
         
         # Format the policy into the expected structure
         formatted_policy = dedent(f"""
+            Vote NO Conditions:
+            - {policy[1]}
 
-            {policy[1]}
+            Vote YES Conditions:
+            - {policy[2]}
 
-            Vote YES Conditions
-            {policy[2]}
-
-            Vote ABSTAIN Conditions
-            {policy[3]}
+            Vote ABSTAIN Conditions:
+            - {policy[3]}
         """).strip()
         
         return {
@@ -288,16 +288,4 @@ def get_voting_policy():
     except Exception as e:
         print(f"Error fetching voting policy: {e}")
         # Return default policy if contract call fails
-        return {
-            'backstory': "I am a seasoned delegate with experience reviewing governance proposals.",
-            'policy': dedent("""
-                Vote NO Conditions
-                The proposal does not clearly demonstrate a return on investment (ROI) of at least 10% annually.
-
-                Vote YES Conditions
-                The proposal clearly demonstrates a return on investment (ROI) of at least 10% annually.
-
-                Vote ABSTAIN Conditions
-                The proposal's return on investment (ROI) cannot be accurately determined from the provided information.
-            """).strip()
-        } 
+        raise Exception(f"Error fetching voting policy: {e}")

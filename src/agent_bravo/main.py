@@ -11,10 +11,22 @@ def run():
     """
     Run Agent Bravo with a proposal and policy as inputs.
     """
-    # Display header
+    # Initialize list to store vote summary
+    vote_summary = []
+    
+    # ASCII Art Banner
+    ascii_banner = """
+    ▄▀█ █▀▀ █▀▀ █▄░█ ▀█▀   █▄▄ █▀█ ▄▀█ █░█ █▀█
+    █▀█ █▄█ ██▄ █░▀█ ░█░   █▄█ █▀▄ █▀█ ▀▄▀ █▄█
+    
+    🤖 Autonomous Governance Agent
+    """
+    
+    # Display header with ASCII art
     header_line = "=" * 60
+    print(ascii_banner)
     print(header_line)
-    print("Agent Bravo - Governance Proposal Processor".center(60))
+    print("Governance Proposal Processor".center(60))
     print(header_line)
     print()
 
@@ -22,6 +34,9 @@ def run():
     policy_info = get_voting_policy()
     policy = policy_info['policy']
     backstory = policy_info['backstory']
+    
+    print(f"Backstory:\n {backstory}\n")        
+    print(f"Voting Policy:\n {policy}\n")
 
     # --- Get Proposals ---
     proposals = get_proposal_created_events()
