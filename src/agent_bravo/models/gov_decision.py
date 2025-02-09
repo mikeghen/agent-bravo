@@ -9,8 +9,8 @@ class GovDecision(BaseModel):
     reasoning: str = Field(
         description="The detailed reasoning behind the opinion."
     )
-    vote: Literal[-1, 0, 1] = Field(
-        description="The vote of the agent (1 = for, 0 = against, -1 = abstain)."
+    vote: Literal[0, 1, 2] = Field(
+        description="The vote of the agent (1 = for, 0 = against, 2 = abstain)."
     )
 
     def cast_vote(self):

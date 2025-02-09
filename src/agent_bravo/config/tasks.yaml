@@ -13,6 +13,6 @@ review_task:
     A JSON object with the following fields:
     * `opinion`: The opinion of the agent.
     * `reasoning`: The reasoning behind the opinion.
-    * `vote`: The vote of the agent (1 = for, 0 = against, -1 = abstain).
+    * `vote`: The vote of the agent (1 = for, 0 = against, 2 = abstain).
 
   agent: delegate
